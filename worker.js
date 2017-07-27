@@ -34,7 +34,7 @@ function setup() {
   {
     harvesterPopulation[j] = new Harvester(random(width),random(height));
   }
-  for(var k = 0; k < 20;++k)
+  for(var k = 0; k < 10;++k)
   {
     predatorPopulation[k] = new Predator(random(width),random(height));
   }
@@ -49,33 +49,25 @@ var populateKDTrees = function()
   deadKDTree = new kdTree([], distance, ["x","y"]);
   for(var i = 0; i < harvesterPopulation.length; ++i)
   {
-    //var target = {itself: population[i], x:population[i].pos.x, y:population[i].pos.y};
-    harvesterKDTree.insert({itself: harvesterPopulation[i], x:harvesterPopulation[i].pos.x, y:harvesterPopulation[i].pos.y});//target
-    //console.log(point);
+    harvesterKDTree.insert({itself: harvesterPopulation[i], x:harvesterPopulation[i].pos.x, y:harvesterPopulation[i].pos.y});
   }
   for(var i = 0; i < predatorPopulation.length; ++i)
   {
-    //var target = {itself: population[i], x:population[i].pos.x, y:population[i].pos.y};
-    predatorKDTree.insert({itself: predatorPopulation[i], x:predatorPopulation[i].pos.x, y:predatorPopulation[i].pos.y});//target
-    //console.log(point);
+    predatorKDTree.insert({itself: predatorPopulation[i], x:predatorPopulation[i].pos.x, y:predatorPopulation[i].pos.y});
   }
   for(var i = 0; i < treePopulation.length; ++i)
   {
-    //var target = {itself: population[i], x:population[i].pos.x, y:population[i].pos.y};
-    treeKDTree.insert({itself: treePopulation[i], x:treePopulation[i].pos.x, y:treePopulation[i].pos.y});//target
-    //console.log(point);
+    treeKDTree.insert({itself: treePopulation[i], x:treePopulation[i].pos.x, y:treePopulation[i].pos.y});
   }
   for(var i = 0; i < dead.length; ++i)
   {
-    //var target = {itself: population[i], x:population[i].pos.x, y:population[i].pos.y};
-    deadKDTree.insert({itself: dead[i], x:dead[i].pos.x, y:dead[i].pos.y});//target
-    //console.log(point);
+    deadKDTree.insert({itself: dead[i], x:dead[i].pos.x, y:dead[i].pos.y});
   }
 }
 function draw() {
   background(0);
 
-  if(drawTimer % 100 == 0)
+  //if(drawTimer % 100 == 0)
   populateKDTrees();
  
 

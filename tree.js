@@ -35,5 +35,9 @@ function Tree(posX, posY)
     rect(this.pos.x-this.size/6, this.pos.y - this.size, this.size/3, this.size);
     fill("green");
     triangle(this.pos.x - this.size/3, this.pos.y - this.size/3, this.pos.x + this.size/3, this.pos.y - this.size/3, this.pos.x, this.pos.y - this.size*2);
-  } 
+  }
+  this.damage = function(double)
+  {
+    this.health
+  }
 }

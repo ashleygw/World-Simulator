@@ -14,9 +14,9 @@ function Predator(posX, posY){
   this.timeAlive = Math.floor(random(0,100));
   this.alive = true;
   this.kills = 0;
-  this.sprint = .4;
-  this.normalSpeed = 0.2;
-  this.walkSpeed = .1;
+  this.sprint = .21;
+  this.normalSpeed = 0.1;
+  this.walkSpeed = .06;
   this.hunger = 0;
   this.range = 50000;
   this.wandir = createVector(0,0);
@@ -90,7 +90,7 @@ function Predator(posX, posY){
   //Completely change the way wandering works.
   this.wander = function(modifier)
   {
-    if(!this.target && this.timeAlive % 100 == 0){
+    if((!this.target && this.timeAlive % 100 == 0) || (this.wandir.x == -1 && this.wandir.y == -1)){
       this.wandir.set(random(width) - this.pos.x, random(height) - this.pos.y);
       this.wandir.normalize();
       this.wandir.mult(this.speed * modifier);
@@ -134,22 +134,24 @@ function Predator(posX, posY){
   }
   else
   {
-    
     if(this.hunger > 300)
     {
       this.updateTarget();
       if(this.target && this.target.exists)
       {
+        this.wandir.set(-1,-1);
         this.visualizeTarget(this.target);
         this.eat(this.target);
       }
       else if(this.target && this.target.alive)
       {
+        this.wandir.set(-1,-1);
         this.visualizeTarget(this.target);
         this.attack(this.target);
       }
       else
       {
+        this.target = null;
         this.wander(this.sprint)
       }
     }

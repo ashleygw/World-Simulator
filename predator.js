@@ -1,7 +1,7 @@
 //TODO: Add better wandering. Use density function/visited areas.
 //Damage effectiveness
 //Variables > Magic numbers. 
-
+//Update not target tree based on time to free memory
 function Predator(posX, posY){
   this.weight = .5;
   this.speed = 10;
@@ -22,8 +22,11 @@ function Predator(posX, posY){
   this.wandir = createVector(0,0);
   this.pos = createVector(posX, posY);
   this.dir = createVector(0,0);
-  
-  //TODO ADD RANGE - Linear search not optimal kdTree improves speed.
+  this.timeHunting = 0;
+  this.notTargets = {};
+  this.huntingThreshold = 300;
+
+  //Linear search not optimal kdTree improves speed.
   //Not in use.
   this.findTargetLinear = function(population)
   {
@@ -52,6 +55,14 @@ function Predator(posX, posY){
   
   this.attack = function(organism)
   {
+    this.timeHunting++;
+    if(this.timeHunting > this.huntingThreshold)
+    {
+      this.notTargets[this.target] = "Avoid";
+      this.timeHunting = 0;
+      this.target = null;
+      return;
+    }
     if (this.distSqrd(organism) > this.width*this.width)
     {
       this.traverse(organism, this.sprint);
@@ -205,13 +216,25 @@ function Predator(posX, posY){
     return Math.pow(a.x - b.x, 2) +  Math.pow(a.y - b.y, 2);
   }
 
+  //this is bugged fix it 
   this.findTargetKD = function(tree)
   {
-    var temp = tree.nearest({x: this.pos.x, y: this.pos.y},1,this.range);
+    // Query the nearest *count* neighbours to a point, with an optional
+    // maximal search distance.
+    // Result is an array with *count* elements.
+    // Each element is an array with two components: the searched point and
+    // the distance to it.
+    var temp = tree.nearest({x: this.pos.x, y: this.pos.y}, 4,this.range);
     if (temp.length != 0){
-      return temp[0][0].itself;
+      for(var i = 0; i < temp.length; ++i)
+      {
+        if(temp[i][0].itself in this.notTargets)
+        {
+          continue;
+        }
+        return temp[i][0].itself;
+      }
     }
-    else
-      return null;
+    return null;
   }
 }

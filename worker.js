@@ -141,3 +141,7 @@ function keyPressed() {
     predatorPopulation[predatorPopulation.length] =  new Predator(mouseX,mouseY);
   }
 }
+
+function getRandomArbitrary(min, max) {
+  return Math.random() * (max - min) + min;
+}

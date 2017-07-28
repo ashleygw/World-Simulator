@@ -12,13 +12,13 @@ function Harvester(posX, posY){
   this.timeAlive = Math.floor(random(0,100));
   this.alive = true;
   this.treesCut = 0;
-  this.walkSpeed= .1;
-  this.sprintSpeed = .25;
+  this.walkSpeed= .1 + getRandomArbitrary(-0.06,0.06);
+  this.sprintSpeed = .25 + getRandomArbitrary(-0.1,0.1);
   this.pos = createVector(posX, posY);
   this.dir = createVector(0,0);
   this.rundir = createVector(0,0);
   this.alertness = 0.6;
-  this.range = 50000;
+  this.range = 8000;
   this.dangerConsideration = 1; 
   this.runTarget = null;
 
@@ -108,7 +108,7 @@ function Harvester(posX, posY){
     }
     else{
       //Check for danger
-      if(this.timeAlive % 60 > 58)
+      //if(this.timeAlive % 60 > 58)
         this.findClosestPredators();
       if(this.runTarget)
       {
@@ -118,7 +118,7 @@ function Harvester(posX, posY){
           //Stop the directional movement
           this.dir.set(0,0);
           //this.target = this.findTargetLinear();
-          this.target = this.findTargetKD(treeKDTree,1, this.range * this.range);
+          this.target = this.findTargetKD(treeKDTree,1, Math.pow(this.range,3));
         }
         if(this.target){
             this.harvest(this.target);

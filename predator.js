@@ -23,8 +23,10 @@ function Predator(posX, posY){
   this.pos = createVector(posX, posY);
   this.dir = createVector(0,0);
   this.timeHunting = 0;
-  this.notTargets = {};
-  this.huntingThreshold = 300;
+  //this.notTargets = {};
+  this.huntingThreshold = 500;
+  this.huntingCooldown = 300;
+  this.cooldownTimer = 0;
 
   //Linear search not optimal kdTree improves speed.
   //Not in use.
@@ -58,9 +60,10 @@ function Predator(posX, posY){
     this.timeHunting++;
     if(this.timeHunting > this.huntingThreshold)
     {
-      this.notTargets[this.target] = "Avoid";
+      //this.notTargets[this.target] = "Avoid";
       this.timeHunting = 0;
-      this.target = null;
+      this.cooldownTimer = this.huntingCooldown;
+      //this.target = null;
       return;
     }
     if (this.distSqrd(organism) > this.width*this.width)
@@ -145,6 +148,7 @@ function Predator(posX, posY){
   }
   else
   {
+    
     if(this.hunger > 300)
     {
       this.updateTarget();
@@ -156,7 +160,8 @@ function Predator(posX, posY){
       }
       else if(this.target && this.target.alive)
       {
-        this.wandir.set(-1,-1);
+        if(this.cooldownTimer <= 0)
+          this.wandir.set(-1,-1);
         this.visualizeTarget(this.target);
         this.attack(this.target);
       }
@@ -196,19 +201,24 @@ function Predator(posX, posY){
         return;
       }
     }
-    if(this.target && this.target.alive)
+    if(this.cooldownTimer <= 0)
     {
-      return;
-    }
-    else
-    {
-      var temp = this.findTargetKD(harvesterKDTree);
-      if (temp && temp.alive)
+      if(this.target && this.target.alive)
       {
-        this.target =  temp;
         return;
       }
+      else
+      {
+        var temp = this.findTargetKD(harvesterKDTree);
+        if (temp && temp.alive)
+        {
+          this.target =  temp;
+          return;
+        }
+      }
     }
+    else
+      --this.cooldownTimer;
     this.target = null;
   }
 
@@ -225,16 +235,19 @@ function Predator(posX, posY){
     // Each element is an array with two components: the searched point and
     // the distance to it.
     var temp = tree.nearest({x: this.pos.x, y: this.pos.y}, 4,this.range);
-    if (temp.length != 0){
-      for(var i = 0; i < temp.length; ++i)
-      {
-        if(temp[i][0].itself in this.notTargets)
-        {
-          continue;
-        }
-        return temp[i][0].itself;
-      }
-    }
-    return null;
+  //   if (temp.length != 0){
+  //     for(var i = 0; i < temp.length; ++i)
+  //     {
+  //       if(temp[i][0].itself in this.notTargets)
+  //       {
+  //         continue;
+  //       }
+  //       return temp[i][0].itself;
+  //     }
+  //   }
+  //   return null;
+  // }
+  if (temp.length != 0)
+    return temp[0][0].itself;
   }
 }

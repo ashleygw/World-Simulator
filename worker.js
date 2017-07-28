@@ -26,11 +26,11 @@ function setup() {
   noStroke();
   fill(255);
   background(0);
-  for(var i = 0; i < 50;++i)
+  for(var i = 0; i < 80;++i)
   {
     treePopulation[i] = new Tree(random(width),random(height));
   }
-  for(var j = 0; j < 30;++j)
+  for(var j = 0; j < 20;++j)
   {
     harvesterPopulation[j] = new Harvester(random(width),random(height));
   }
@@ -139,6 +139,10 @@ function mousePressed() {
 function keyPressed() {
   if (key == "P") {
     predatorPopulation[predatorPopulation.length] =  new Predator(mouseX,mouseY);
+  }
+  if(key == "C")
+  {
+    dead[dead.length] =  new Corpse(mouseX,mouseY, 40 , "Harvester");
   }
 }
 

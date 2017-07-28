@@ -82,7 +82,8 @@ function Harvester(posX, posY){
     }
     //If at tree, cut it
     else{
-      
+      if(this.timeAlive % 50 == 0)
+        this.health++;
       if(this.timeAlive % 10 == 0)
       {
         tree.health--; 
@@ -99,8 +100,6 @@ function Harvester(posX, posY){
   this.update = function()
   {
     //cycle based on alertness
-    
-      
     this.timeAlive++;
     if(this.health <= 0)
     {

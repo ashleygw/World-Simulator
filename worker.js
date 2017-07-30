@@ -21,20 +21,20 @@ var drawTimer = 0;
 
 
 function setup() {
-  createCanvas(1910, 940);
+  createCanvas(windowWidth, windowHeight);
   //stroke(255);
   noStroke();
   fill(255);
   background(0);
-  for(var i = 0; i < 80;++i)
+  for(var i = 0; i < 0;++i)
   {
     treePopulation[i] = new Tree(random(width),random(height));
   }
-  for(var j = 0; j < 20;++j)
+  for(var j = 0; j < 0;++j)
   {
     harvesterPopulation[j] = new Harvester(random(width),random(height));
   }
-  for(var k = 0; k < 10;++k)
+  for(var k = 0; k < 0;++k)
   {
     predatorPopulation[k] = new Predator(random(width),random(height));
   }
@@ -85,9 +85,6 @@ function draw() {
   {
     harvesterPopulation[j].update();
     harvesterPopulation[j].display();
-    //harvesterPopulation[j].x = harvesterPopulation[j].pos.x;
-    //harvesterPopulation[j].y = harvesterPopulation[j].pos.y;
-
     if(!harvesterPopulation[j].alive)
     {
        harvesterPopulation.splice(j,1);
@@ -114,7 +111,7 @@ function draw() {
     }
   }
   
-  ++drawTimer;
+  //++drawTimer;
   // for(var l = resources.length - 1; l >= 0; --l)
   // {
   //   resources[l].update();
@@ -144,8 +141,27 @@ function keyPressed() {
   {
     dead[dead.length] =  new Corpse(mouseX,mouseY, 40 , "Harvester");
   }
+  if(key == "H")
+  {
+    harvesterPopulation[harvesterPopulation.length] = new Harvester(mouseX,mouseY);
+  }
+  if(key == "T")
+  {
+    treePopulation[treePopulation.length] =  new Tree(mouseX,mouseY);
+  }
 }
 
 function getRandomArbitrary(min, max) {
   return Math.random() * (max - min) + min;
+}
+
+//https://goo.gl/DseDJW
+function makeid() {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < 5; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
 }

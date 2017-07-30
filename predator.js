@@ -1,7 +1,7 @@
 //TODO: Add better wandering. Use density function/visited areas.
 //Damage effectiveness
 //Variables > Magic numbers. 
-//Update not target tree based on time to free memory
+
 function Predator(posX, posY){
   this.weight = .5;
   this.speed = 10;
@@ -18,15 +18,19 @@ function Predator(posX, posY){
   this.normalSpeed = 0.1;
   this.walkSpeed = .06;
   this.hunger = 0;
+  this.hungerThreshold = 300;
   this.range = 50000;
   this.wandir = createVector(0,0);
   this.pos = createVector(posX, posY);
   this.dir = createVector(0,0);
   this.timeHunting = 0;
-  //this.notTargets = {};
   this.huntingThreshold = 500;
   this.huntingCooldown = 300;
   this.cooldownTimer = 0;
+  this.stomachSize = 30;
+  this.foodIn = 0;
+  this.hungerDamageThreshold = 1300;
+  this.id = makeid();
 
   //Linear search not optimal kdTree improves speed.
   //Not in use.
@@ -74,11 +78,13 @@ function Predator(posX, posY){
     {
       if(this.timeAlive % 10 == 0)
       {
+        this.timeHunting -= 100;
         organism.health--; 
         if(organism.health <=0)
         {
           this.kills++;
           this.target = null;
+          this.timeHunting = 0;
         }
       }
     }
@@ -92,12 +98,21 @@ function Predator(posX, posY){
     }
     else
     {
-      consumable.size -= 10;
-      if(this.health < this.maxHealth)
-        this.health+=10;
-      this.hunger = 0;
-      this.dir.set(0,0);
+      if(this.timeAlive % 30 == 0)
+      {
+        consumable.size -= 1;
+        ++this.foodIn;
+        //Think about last conditional here
+        if(this.foodIn >= this.stomachSize || consumable.size <= 0 || this.hunger > this.hungerDamageThreshold)
+          this.emptyStomach();
+        this.dir.set(0,0);
+      }
     }
+  }
+  this.emptyStomach = function()
+  {
+    this.hunger -= this.foodIn * 100;
+    this.foodIn = 0;
   }
 
   //TODO think of a way to never use this function again.
@@ -140,49 +155,52 @@ function Predator(posX, posY){
 
   this.update = function()
   {
-  this.timeAlive++;
-  this.hunger++;
-  if(this.health <= 0)
-  {
-     this.die();
-  }
-  else
-  {
-    
-    if(this.hunger > 300)
+    // console.log("HUNGER: " + this.hunger);
+    // console.log("FOODIN: " + this.foodIn);
+
+    this.timeAlive++;
+    this.hunger++;
+    if(this.health <= 0)
     {
-      this.updateTarget();
-      if(this.target && this.target.exists)
-      {
-        this.wandir.set(-1,-1);
-        this.visualizeTarget(this.target);
-        this.eat(this.target);
-      }
-      else if(this.target && this.target.alive)
-      {
-        if(this.cooldownTimer <= 0)
-          this.wandir.set(-1,-1);
-        this.visualizeTarget(this.target);
-        this.attack(this.target);
-      }
-      else
-      {
-        this.target = null;
-        this.wander(this.sprint)
-      }
+       this.die();
     }
     else
     {
-      //there is a better way to deal with targetting. This works for now though.
-      this.target = null;
-      this.wander(this.walkSpeed);
+      
+      if(this.hunger > this.hungerThreshold)
+      {
+        this.updateTarget();
+        if(this.target && this.target.exists)
+        {
+          this.wandir.set(-1,-1);
+          this.visualizeTarget(this.target);
+          this.eat(this.target);
+        }
+        else if(this.target && this.target.alive)
+        {
+          if(this.cooldownTimer <= 0)
+            this.wandir.set(-1,-1);
+          this.visualizeTarget(this.target);
+          this.attack(this.target);
+        }
+        else
+        {
+          this.target = null;
+          this.wander(this.sprint)
+        }
+      }
+      else
+      {
+        //there is a better way to deal with targetting. This works for now though.
+        this.target = null;
+        this.wander(this.walkSpeed);
+      }
     }
-  }
 
-  if(this.hunger > 1000 && this.timeAlive % 100 == 0)
-    this.health--;
-  else if (this.timeAlive % 1000 == 0 && this.health < this.maxHealth)
-    this.health++;
+    if(this.hunger > this.hungerDamageThreshold && this.timeAlive % 100 == 0)
+      this.health--;
+    else if (this.timeAlive % 1000 == 0 && this.health < this.maxHealth)
+      this.health++;
   }
 
   //TODO make this better
@@ -226,7 +244,6 @@ function Predator(posX, posY){
     return Math.pow(a.x - b.x, 2) +  Math.pow(a.y - b.y, 2);
   }
 
-  //this is bugged fix it 
   this.findTargetKD = function(tree)
   {
     // Query the nearest *count* neighbours to a point, with an optional
@@ -234,20 +251,8 @@ function Predator(posX, posY){
     // Result is an array with *count* elements.
     // Each element is an array with two components: the searched point and
     // the distance to it.
-    var temp = tree.nearest({x: this.pos.x, y: this.pos.y}, 4,this.range);
-  //   if (temp.length != 0){
-  //     for(var i = 0; i < temp.length; ++i)
-  //     {
-  //       if(temp[i][0].itself in this.notTargets)
-  //       {
-  //         continue;
-  //       }
-  //       return temp[i][0].itself;
-  //     }
-  //   }
-  //   return null;
-  // }
-  if (temp.length != 0)
-    return temp[0][0].itself;
+    var temp = tree.nearest({x: this.pos.x, y: this.pos.y}, 1,this.range);
+    if (temp.length != 0)
+      return temp[0][0].itself;
   }
 }

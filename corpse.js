@@ -1,4 +1,5 @@
 
+
 function Corpse(posX, posY, size, type)
 {
   this.pos = createVector(posX, posY);

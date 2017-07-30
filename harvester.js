@@ -13,7 +13,7 @@ function Harvester(posX, posY){
   this.alive = true;
   this.treesCut = 0;
   this.walkSpeed= .1 + getRandomArbitrary(-0.06,0.06);
-  this.sprintSpeed = .25 + getRandomArbitrary(-0.1,0.1);
+  this.sprintSpeed = .20 + getRandomArbitrary(-0.1,0.1);
   this.pos = createVector(posX, posY);
   this.dir = createVector(0,0);
   this.rundir = createVector(0,0);
@@ -21,7 +21,9 @@ function Harvester(posX, posY){
   this.range = 8000;
   this.dangerConsideration = 1; 
   this.runTarget = null;
-
+  this.findingNewTarget = true;
+  this.id = makeid();
+  
   this.die = function()
   {
     this.alive = false;
@@ -112,16 +114,21 @@ function Harvester(posX, posY){
       if(this.runTarget)
       {
         this.traverse(this.runTarget, -this.sprintSpeed);
+        this.findingNewTarget = true;
       }
-      else  if(!this.target || !this.target.alive){
+      else  
+        {
+          if(!this.target || !this.target.alive || this.findingNewTarget){
           //Stop the directional movement
           this.dir.set(0,0);
           //this.target = this.findTargetLinear();
           this.target = this.findTargetKD(treeKDTree,1, Math.pow(this.range,3));
-        }
-        if(this.target){
+          }
+          if(this.target){
+            this.findingNewTarget = false;
             this.harvest(this.target);
           }
+        }
     if(this.timeAlive % 1000 == 0)
       this.health--;
       

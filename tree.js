@@ -4,7 +4,7 @@ function Tree(posX, posY)
   this.size = 40;
   this.alive = true;
   this.health = 10;
-  this.timeAlive = 0;
+  this.timeAlive = Math.floor(random(0,100));
   this.maxSize = 100;
   this.fertilePoint = this.maxSize/2;
   this.growPeriod = 300;

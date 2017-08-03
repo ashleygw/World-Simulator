@@ -26,8 +26,9 @@ function Harvester(posX, posY){
 
   this.findingMate = false;
   this.fertilePoint = 200; // This.growthrate
-  this.canReproduce = 5;
+  this.canReproduce = 3;
   this.mate = null;
+  this.refractoryPeriod = 2000;
 
   this.die = function()
   {
@@ -130,23 +131,25 @@ function Harvester(posX, posY){
           if(this.mate && this.mate.alive)
           {
             this.reproduce();
+            return;
           }
           else
+          {
             this.mate = this.findMate();
-        }
-        else 
-        {
-          if(!this.target || !this.target.alive || this.findingNewTarget){
-            //Stop the directional movement
-            this.dir.set(0,0);
-            //this.target = this.findTargetLinear();
-            this.target = this.findTargetKD(treeKDTree,1, Math.pow(this.range,3));
           }
-          if(this.target){
-            this.findingNewTarget = false;
-            this.harvest(this.target);
-          }
+            
         }
+        if(!this.target || !this.target.alive || this.findingNewTarget){
+          //Stop the directional movement
+          this.dir.set(0,0);
+          //this.target = this.findTargetLinear();
+          this.target = this.findTargetKD(treeKDTree,1, Math.pow(this.range,3));
+        }
+        if(this.target){
+          this.findingNewTarget = false;
+          this.harvest(this.target);
+        }
+        
       }
     }  
   }
@@ -154,20 +157,22 @@ function Harvester(posX, posY){
   //NO MATE FREEZES IT
   this.reproduce = function()
   {
-    //Check if not at mate
     if (this.distSqrd(this.mate) > this.width*this.width)
     {
+      console.log(this.mate.id + "   " + this.id);
       //Move to mate
       this.traverse(this.mate, this.walkSpeed);
     }
-    //If at mate, mate it
     else{
+      //console.log(this.mate.id + "   " + this.id);
       //instant birth?
       //Permanent mate?
+      this.mate.canReproduce--;
+      this.mate.fertilePoint += this.mate.timeAlive + this.mate.refractoryPeriod;
       this.mate = null;
-      this.fertilePoint += this.timeAlive + 1000;
+      this.fertilePoint += this.timeAlive + this.refractoryPeriod;
       this.canReproduce--;
-      harvesterPopulation[harvesterPopulation.length] =  new Harvester(this.pos.x, this.pos.y);
+      harvesterPopulation[harvesterPopulation.length] =  new Harvester(this.pos.x + this.width, this.pos.y + this.height);
     }
   }
   
@@ -202,11 +207,13 @@ function Harvester(posX, posY){
     else
       return null;
   }
+
+  //determine mate with more specs
   this.findMate = function()
   {
-    var temp = harvesterKDTree.nearest({x: this.pos.x, y: this.pos.y},2, this.range*this.range);
+    var temp = harvesterKDTree.nearest({x: this.pos.x, y: this.pos.y},2, this.range);
     if (temp.length > 1){
-      return temp[1][0].itself;
+      return temp[0][0].itself;
     }
     else
       return null;

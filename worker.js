@@ -9,16 +9,13 @@ var harvesterPopulation = [];
 var predatorPopulation = [];
 var dead = [];
 var resources = []; // add to loop
-
-var distance = function(a, b){
-  return Math.pow(a.x - b.x, 2) +  Math.pow(a.y - b.y, 2);
-  }
+var pops;
 var harvesterKDTree = new kdTree([], distance, ["x","y"]);
 var predatorKDTree = new kdTree([], distance, ["x","y"]);
 var treeKDTree = new kdTree([], distance, ["x","y"]);
 var deadKDTree = new kdTree([], distance, ["x","y"]);
 var drawTimer = 0;
-
+var sustainable = true;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -38,6 +35,8 @@ function setup() {
   {
     predatorPopulation[k] = new Predator(random(width),random(height));
   }
+  pops = createP("Population");
+  pops.class("pop");
   //ellipseMode(CENTER);
 
 }
@@ -64,12 +63,14 @@ var populateKDTrees = function()
     deadKDTree.insert({itself: dead[i], x:dead[i].pos.x, y:dead[i].pos.y});
   }
 }
+
 function draw() {
   background(0);
-
-  //if(drawTimer % 100 == 0)
+  displayInfo();
   populateKDTrees();
- 
+
+  if(!isSustainable())
+    //Reset with new genes
 
   for(var i = treePopulation.length - 1; i >= 0; --i)
   {
@@ -110,19 +111,18 @@ function draw() {
        dead.splice(l,1);
     }
   }
-  
-  //++drawTimer;
-  // for(var l = resources.length - 1; l >= 0; --l)
-  // {
-  //   resources[l].update();
-  //   resources[l].display();
-  //   if(!resources[l].exists)
-  //   {
-  //      resources.splice(l,1);
-  //   }
-  // }
 }
 
+function buildGenes()
+{
+  
+}
+function isSustainable()
+{
+  if(treePopulation.length < 1 || harvesterPopulation.length < 2 || predatorPopulation.length < 2)
+    return false
+  return true;
+}
 function mousePressed() {
   if(mouseButton == LEFT)
     treePopulation[treePopulation.length] =  new Tree(mouseX,mouseY);
@@ -155,6 +155,15 @@ function getRandomArbitrary(min, max) {
   return Math.random() * (max - min) + min;
 }
 
+function displayInfo() {
+  var popInfo = "Predator Population:     " + predatorPopulation.length + "<br>";
+  popInfo +=    "Harvester Population:       " + harvesterPopulation.length + "<br>";
+  popInfo +=    "Tree Population:      " + treePopulation.length + "<br>";
+  popInfo +=    "Dead Population:         " + dead.length;
+  pops.html(popInfo);
+
+ 
+}
 //https://goo.gl/DseDJW
 function makeid() {
   var text = "";
@@ -165,3 +174,7 @@ function makeid() {
 
   return text;
 }
+
+var distance = function(a, b){
+  return Math.pow(a.x - b.x, 2) +  Math.pow(a.y - b.y, 2);
+  }

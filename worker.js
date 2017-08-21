@@ -16,6 +16,8 @@ var treeKDTree = new kdTree([], distance, ["x","y"]);
 var deadKDTree = new kdTree([], distance, ["x","y"]);
 var drawTimer = 0;
 var sustainable = true;
+var popmax;
+var mutationRate;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -23,21 +25,24 @@ function setup() {
   noStroke();
   fill(255);
   background(0);
-  for(var i = 0; i < 0;++i)
+  for(var i = 0; i < 80;++i)
   {
     treePopulation[i] = new Tree(random(width),random(height));
   }
-  for(var j = 0; j < 0;++j)
+  for(var j = 0; j < 10;++j)
   {
     harvesterPopulation[j] = new Harvester(random(width),random(height));
   }
-  for(var k = 0; k < 0;++k)
+  for(var k = 0; k < 4;++k)
   {
     predatorPopulation[k] = new Predator(random(width),random(height));
   }
   pops = createP("Population");
   pops.class("pop");
   //ellipseMode(CENTER);
+  popmax = 100;
+  mutationRate = 0.01;
+  //population = new Population(mutationRate, popmax);
 
 }
 var populateKDTrees = function()
@@ -68,10 +73,15 @@ function draw() {
   background(0);
   displayInfo();
   populateKDTrees();
-
-  if(!isSustainable())
+  displayGUI();
+  //if(!isSustainable())
     //Reset with new genes
 
+  
+}
+
+function displayGUI()
+{
   for(var i = treePopulation.length - 1; i >= 0; --i)
   {
     treePopulation[i].update();
@@ -111,11 +121,6 @@ function draw() {
        dead.splice(l,1);
     }
   }
-}
-
-function buildGenes()
-{
-  
 }
 function isSustainable()
 {

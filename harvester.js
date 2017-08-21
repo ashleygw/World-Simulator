@@ -25,7 +25,7 @@ function Harvester(posX, posY){
   this.id = makeid();
 
   this.findingMate = false;
-  this.fertilePoint = 200; // This.growthrate
+  this.fertilePoint = 2000; // This.growthrate
   this.canReproduce = 3;
   this.mate = null;
   this.refractoryPeriod = 2000;
@@ -61,22 +61,9 @@ function Harvester(posX, posY){
 
   this.traverse = function(target, speedModifier)
   {
-    //Check if there is no current direction
-    // if(this.runTarget)
-    // {
-    //   this.visualizeTarget(this.runTarget);
-    //   //Check if there is no current direction
-    //   this.rundir.set(this.runTarget.pos.x - this.pos.x, this.runTarget.pos.y - this.pos.y);
-    //   this.rundir.normalize();
-    //   this.rundir.mult(this.speed * speedModifier);
-    //   this.pos.sub(this.dir);
-    // }
-    //if(this.dir.x == 0 && this.dir.y == 0){
       this.dir.set(target.pos.x - this.pos.x, target.pos.y - this.pos.y);
       this.dir.normalize();
       this.dir.mult(this.speed * speedModifier);
-    //}
-    //else
       this.pos.add(this.dir);
   }
   
@@ -159,7 +146,7 @@ function Harvester(posX, posY){
   {
     if (this.distSqrd(this.mate) > this.width*this.width)
     {
-      console.log(this.mate.id + "   " + this.id);
+      //console.log(this.mate.id + "   " + this.id);
       //Move to mate
       this.traverse(this.mate, this.walkSpeed);
     }
@@ -167,6 +154,7 @@ function Harvester(posX, posY){
       //console.log(this.mate.id + "   " + this.id);
       //instant birth?
       //Permanent mate?
+      this.health /= 2;
       this.mate.canReproduce--;
       this.mate.fertilePoint += this.mate.timeAlive + this.mate.refractoryPeriod;
       this.mate = null;

@@ -77,7 +77,7 @@ function Predator(posX, posY){
     else
     {
       this.timeHunting -= 100;
-      if(this.timeAlive % 5 == 0)
+      if(this.timeAlive % 2 == 0)
       {
         organism.health--; 
         if(organism.health <=0)
